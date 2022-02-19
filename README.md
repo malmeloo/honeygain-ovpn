@@ -65,6 +65,15 @@ docker build . -t honeygain-ovpn
 This will pull the latest official Honeygain client from DockerHub and build the `honeygain-ovpn` image, which can be used by
 all your containers.
 
-After building the image, you are now able to create your containers.
+After building the image, you are now able to create your containers. They need quite some parameters to ensure that everything goes
+smoothly, which is mostly because OpenVPN needs to be able to connect properly and modify some network settings.
 
-< more info >
+| **Option**     | **Value**                                                                | **Notes**                                                                                    |
+|----------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| Container Name | honeygain-\<country code>                                                | Can be anything you like, but should be recognizable.                                        |
+| Volume         | /path/to/config-\<country code>.ovpn:/config.ovpn                        | You should mount your OpenVPN config as a volume under /config.ovpn                          |
+| Command        | -tou-accept -email \<email> -pass \<pass> -device DOCKER_\<country code> | "-device" flag can be anything you like, but again, make it recognizable.                    |
+| Privileged     | true                                                                     | Necessary for OpenVPN to work                                                                |
+| Sysctls        | net.ipv6.conf.all.disable_ipv6=0                                         | IPv6 should be enabled (= set to 0), otherwise your VPN might not connect properly           |
+| Capabilities   | NET_ADMIN                                                                | Necessary for OpenVPN to work                                                                |
+| Restart        | unless-stopped                                                           | Does not matter much for functionality, but you likely want your containers to keep running. |
