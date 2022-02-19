@@ -2,6 +2,28 @@
 
 Spawn multiple Honeygain instances all over the world from one machine!
 
+## But why?
+
+Honeygain pays you more if you have multiple devices on many different IPs. So I thought, why not put my VPN to good use and
+deploy some clients worldwide? They still don't pay you much (~$9 per month in my case, running 8 containers and an android
+phone), but everything is deployed from a google cloud instance that costs me less than $1 per month. It requires very little
+maintenance other than the occasional reboot because my VPN provider disconnected one of my containers.
+
+<details>
+  <summary>Screenshots</summary>
+  
+  Can you see when I deployed the containers?
+  ![image](https://user-images.githubusercontent.com/32306794/154802824-92c22a6d-92d5-428d-bc63-1e56e54c26cb.png)
+  
+  The running containers from my Google cloud instance
+  ![image](https://user-images.githubusercontent.com/32306794/154803340-75887785-5c06-4e98-9f00-94a7e1d615d7.png)
+  
+  What the devices look like in my Honeygain dashboard
+  ![image](https://user-images.githubusercontent.com/32306794/154803050-dac9bd43-f529-46cc-87af-007e7d660bff.png)
+
+</details>
+
+
 ## How?
 Honeygain provides an image that can be used to run a client on any machine that can run Docker.
 Releasing their client as a docker image has an interesting side effect: it allows you to run multiple instances
@@ -31,9 +53,9 @@ This essentially means that you can connect to the same location multiple times 
 
 ## Okay, understood. Now how do I use this?
 
-First, you should obtain OpenVPN configs for the different locations that you want to connect to.
-
-< more explanation here >
+First, you should obtain OpenVPN configs for the different locations that you want to connect to. Most VPN providers already use OpenVPN under
+the hood, but not all of them allow you to actually obtain the config. Usually, you'll end up having multiple configuration files for every location
+(country) that you want to connect to.
 
 Second, you're gonna have to build the image:
 ```shell
