@@ -77,3 +77,17 @@ smoothly, which is mostly because OpenVPN needs to be able to connect properly a
 | Sysctls        | net.ipv6.conf.all.disable_ipv6=0                                         | IPv6 should be enabled (= set to 0), otherwise your VPN might not connect properly           |
 | Capabilities   | NET_ADMIN                                                                | Necessary for OpenVPN to work                                                                |
 | Restart        | unless-stopped                                                           | Does not matter much for functionality, but you likely want your containers to keep running. |
+
+<br>
+
+Example command:
+```shell
+docker run -d \
+    --name "honeygain-nl" \
+    -v "$(pwd)/configs/config-nl.ovpn:/config.ovpn" \
+    --privileged \
+    --sysctl "net.ipv6.conf.all.disable_ipv6=0" \
+    --cap-add "NET_ADMIN" \
+    --restart "unless-stopped" \
+    honeygain-ovpn "-tou-accept -email my-email@ex.com -pass my-pass -device DOCKER_NL"
+```
