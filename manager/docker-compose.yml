@@ -9,9 +9,6 @@ services:
       - ../configs:/app/configs
       - ./manager.py:/app/manager.py
       - hg-data:/app/data
-    environment:
-      - HONEYGAIN_EMAIL=mike@example.com
-      - HONEYGAIN_PASS=example_password
 
 volumes:
   hg-data:

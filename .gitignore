@@ -3,3 +3,4 @@ bin/*
 config-*.ovpn
 .env
 .idea/*
+.env
