@@ -9,6 +9,8 @@ services:
       - ../configs:/app/configs
       - ./manager.py:/app/manager.py
       - hg-data:/app/data
+    env_file:
+      - .env
 
 volumes:
   hg-data:
