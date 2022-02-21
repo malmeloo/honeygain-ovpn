@@ -1,0 +1,2 @@
+honeygain.py>=1.0,<2.0
+docker>=5.0,<6.0

@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  manager:
+    build: .
+    image: honeygain_manager
+    container_name: honeygain_manager
+    volumes:
+      - ../configs:/app/configs
+      - ./manager.py:/app/manager.py
+      - hg-data:/app/data
+    environment:
+      - HONEYGAIN_EMAIL=mike@example.com
+      - HONEYGAIN_PASS=example_password
+
+volumes:
+  hg-data:
