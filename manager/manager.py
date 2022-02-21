@@ -14,13 +14,18 @@ if not (EMAIL and PASS):
     sys.exit(1)
 
 
-print('[-] Logging in...')
 client = honeygain.Client()
 try:
-    with open('data/jwt-token.txt') as file:
+    with open('data/jwt-token.txt', 'r') as file:
+        print('[-] Logging in using stored credentials')
         client.token = file.read().strip()
 except FileNotFoundError:
+    print('[-] Logging in...')
     client.login(EMAIL, PASS)
+
+    with open('data/jwt-token.txt', 'w+') as file:
+        print('[-] Saving credentials for next start')
+        file.write(client.token)
 
 
 def main():
