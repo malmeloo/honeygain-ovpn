@@ -113,7 +113,7 @@ def _start_client(code):
 
 
 def run_once():
-    logging.info('--- Running manager tasks')
+    logging.info(' --- Running manager tasks')
 
     active_devices, inactive_devices, dev_count = _get_devices()
     all_devices = active_devices | inactive_devices
@@ -134,6 +134,8 @@ def run_once():
         _restart_client(device)
     for device in to_add:
         _start_client(device)
+
+    logging.info(' --- Manager done')
 
 
 def main():
