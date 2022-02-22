@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 EMAIL = os.environ.get('HONEYGAIN_EMAIL')
 PASS = os.environ.get('HONEYGAIN_PASS')
+ROOT = os.environ.get('ROOT')
 
 DEVICENAME_RE = re.compile(r'DOCKER_(\w+)')
 CONTAINER_RE = re.compile(r'honeygain-(\w+)')
@@ -37,10 +38,15 @@ except FileNotFoundError:
         token_file.write(hg.token)
 
 
+###################################################
+
+
 def _get_devices():
     active_devices = set()
     inactive_devices = set()
+    total = 0
     for device in hg.get_devices():
+        total += 1
         matches = DEVICENAME_RE.match(device.name)
         if matches:
             if device.status == 'active':
@@ -48,7 +54,7 @@ def _get_devices():
             else:
                 inactive_devices.add(matches.group(1).lower())
 
-    return active_devices, inactive_devices
+    return active_devices, inactive_devices, total
 
 
 def _get_configs():
@@ -61,31 +67,75 @@ def _get_configs():
     return configs
 
 
-def _restart_container(code):
+###############################################
+
+
+def _remove_client(code):
+    try:
+        container = docker_client.containers.get(f'DOCKER_{code.upper()}')
+        container.remove(force=True)
+    except docker.errors.NotFound:  # already removed
+        pass
+    logging.info(f'Removed client {code}')
+
+
+def _restart_client(code):
     try:
         container = docker_client.containers.get(f'honeygain-{code}')
         container.restart()
         logging.info(f'Restarted client {code}')
     except docker.errors.NotFound:
         logging.warning(f'Remote client {code} not found running locally')
-        return
+        return _start_client(code)
+
+
+def _start_client(code):
+    config_path = os.path.join(ROOT, 'configs', f'config-{code}.ovpn')
+    dev_name = f'DOCKER_{code.upper()}'
+
+    docker_client.containers.run(
+        image='honeygain-ovpn',
+        name=f'honeygain-{code}',
+        command=f'-tou-accept -email {EMAIL} -pass {PASS} -device {dev_name}',
+
+        volumes=[f'{config_path}:/config.ovpn'],
+        privileged=True,
+        sysctls={'net.ipv6.conf.all.disable_ipv6': '0'},
+        cap_add=['NET_ADMIN']
+    )
+    logging.info('Started container for ' + code)
+
+
+################################################
+
+
+def run_once():
+    active_devices, inactive_devices, dev_count = _get_devices()
+    all_devices = active_devices | inactive_devices
+    configs = _get_configs()
+
+    to_remove = all_devices - configs
+    to_restart = inactive_devices - to_remove
+    to_add = configs - all_devices
+
+    max_new_dev_count = 10 - dev_count
+    if len(to_add) > max_new_dev_count:
+        logging.warning(f'Limiting new devices to {max_new_dev_count}')
+        to_add = set(list(to_add)[:max_new_dev_count])
+
+    for device in to_remove:
+        _remove_client(device)
+    for device in to_restart:
+        _restart_client(device)
+    for device in to_add:
+        _start_client(device)
 
 
 def main():
     me = hg.get_profile()
     logging.info('Logged in as ' + me.email)
 
-    active_devices, inactive_devices = _get_devices()
-    all_devices = active_devices | inactive_devices
-    configs = _get_configs()
-
-    to_remove = all_devices - configs
-    to_add = configs - active_devices
-
-    for device in to_remove:
-        print('Removing device ' + device)
-    for device in to_add:
-        print('Adding device ' + device)
+    run_once()
 
 
 if __name__ == '__main__':
