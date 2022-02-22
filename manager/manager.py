@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import time
 
 import docker
 import docker.errors
@@ -90,6 +91,7 @@ def _restart_client(code):
 
 
 def _start_client(code):
+    logging.info('Starting client ' + code)
     config_path = os.path.join(ROOT, 'configs', f'config-{code}.ovpn')
     dev_name = f'DOCKER_{code.upper()}'
 
@@ -110,6 +112,8 @@ def _start_client(code):
 
 
 def run_once():
+    logging.info('--- Running manager tasks')
+
     active_devices, inactive_devices, dev_count = _get_devices()
     all_devices = active_devices | inactive_devices
     configs = _get_configs()
@@ -135,7 +139,13 @@ def main():
     me = hg.get_profile()
     logging.info('Logged in as ' + me.email)
 
-    run_once()
+    try:
+        while True:
+            run_once()
+            time.sleep(60 * 15)
+
+    except KeyboardInterrupt:
+        return 0
 
 
 if __name__ == '__main__':
