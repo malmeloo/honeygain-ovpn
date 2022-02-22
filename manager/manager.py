@@ -99,6 +99,7 @@ def _start_client(code):
         image='honeygain-ovpn',
         name=f'honeygain-{code}',
         command=f'-tou-accept -email {EMAIL} -pass {PASS} -device {dev_name}',
+        detach=True,
 
         volumes=[f'{config_path}:/config.ovpn'],
         privileged=True,
