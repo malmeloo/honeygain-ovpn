@@ -65,8 +65,26 @@ docker build . -t honeygain-ovpn
 This will pull the latest official Honeygain client from DockerHub and build the `honeygain-ovpn` image, which can be used by
 all your containers.
 
-After building the image, you are now able to create your containers. They need quite some parameters to ensure that everything goes
-smoothly, which is mostly because OpenVPN needs to be able to connect properly and modify some network settings.
+
+After building the image, you can now start the manager container. This is a specially crafted container that will manage all your Honeygain
+clients for you. To start using it, first `cd` into the `manager` directory, and then execute the following command:
+```shell
+docker-compose up -d
+```
+
+The manager will now run automatically every 15 minutes, keeping your containers online and saving you effort. It will also claim your daily
+rewards without you having to do so yourself ;)
+
+## Configuring VPN connections
+
+In order to actually run some containers, you will have to drop some OpenVPN configurations into the `configs` directory. The name of the file
+MUST be in the format `config-<identifier>.ovpn` (example: `config-nl.ovpn`.) The manager will notice your new (or removed) configuration, create
+a container called `honeygain-<identifier>`, and join your Honeygain account using the name `DOCKER_<identifier>`. If it notices that a configuration
+is missing, it will shut down the container for you; however, please note that it takes 2 weeks before Honeygain will let you add a new device under
+a different name. Therefore the manager will actively limit you to running 10 clients at once on your account.
+
+
+## Manually building / starting the image
 
 | **Option**     | **Value**                                                                | **Notes**                                                                                    |
 |----------------|--------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
