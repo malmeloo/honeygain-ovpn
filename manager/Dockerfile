@@ -8,7 +8,7 @@ RUN apk add --update --no-cache python3 \
 
 # init environment
 RUN mkdir app
-# COPY manager.py app/
+COPY manager.py app/
 COPY requirements.txt app/
 WORKDIR app
 
