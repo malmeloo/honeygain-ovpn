@@ -128,8 +128,8 @@ def run_once():
         logging.warning(f'Limiting new devices to {max_new_dev_count}')
         to_add = set(list(to_add)[:max_new_dev_count])
 
-    if client.can_claim_credits:
-        winnings = client.claim_credits()
+    if hg.can_claim_credits:
+        winnings = hg.claim_credits()
         print(f"Claimed your daily credits! ({winnings})")
 
     for device in to_remove:
